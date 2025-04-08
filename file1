@@ -1,0 +1,33 @@
+from transformers import pipeline
+import random
+
+# 1. Synthetic Meeting Data Generator
+def generate_synthetic_meeting():
+    topics = [
+        "project updates", "budget allocation", "marketing strategy", "client feedback",
+        "product roadmap", "hiring decisions", "team performance", "technical challenges"
+    ]
+    participants = ["Alice", "Bob", "Clara", "David", "Eve", "Frank"]
+    sentences = []
+
+    for i in range(20):  # simulate 20 lines of conversation
+        speaker = random.choice(participants)
+        topic = random.choice(topics)
+        sentence = f"{speaker} said we need to revisit the {topic} and make improvements based on last quarter's report."
+        sentences.append(sentence)
+
+    return " ".join(sentences)
+
+# 2. Load Summarization Model
+def summarize_meeting(transcript):
+    summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+    summary = summarizer(transcript, max_length=150, min_length=40, do_sample=False)
+    return summary[0]['summary_text']
+
+# 3. Driver Code
+if __name__ == "__main__":
+    transcript = generate_synthetic_meeting()
+    print("📋 Original Transcript:\n", transcript, "\n")
+    
+    summary = summarize_meeting(transcript)
+    print("📝 Generated Summary:\n", summary)
