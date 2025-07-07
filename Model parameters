@@ -1,0 +1,21 @@
+# Model parameters
+MODEL = "gpt-4-turbo"  # Try gpt-3.5-turbo for faster results
+MAX_TOKENS = 4096       # Maximum tokens per API call
+TEMPERATURE = 0.3       # Lower = more deterministic
+
+# Customize summary structure
+SYSTEM_PROMPT = """
+You are an expert meeting summarizer. Generate:
+- Concise meeting summary
+- Key decisions with owners
+- Action items with deadlines
+- Unresolved topics
+- Discussion highlights
+
+Format in Markdown with headings:
+# [Meeting Title]
+## Key Decisions
+## Action Items
+## Unresolved Topics
+## Discussion Points
+"""
