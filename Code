@@ -1,0 +1,71 @@
+import argparse
+import openai
+from config import MODEL, SYSTEM_PROMPT, MAX_TOKENS, TEMPERATURE
+import tiktoken
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
+
+def count_tokens(text):
+    encoding = tiktoken.encoding_for_model(MODEL)
+    return len(encoding.encode(text))
+
+def split_text(text, max_tokens=2000):
+    paragraphs = text.split('\n\n')
+    chunks = []
+    current_chunk = ""
+    
+    for para in paragraphs:
+        if count_tokens(current_chunk + para) > max_tokens:
+            chunks.append(current_chunk)
+            current_chunk = para + "\n\n"
+        else:
+            current_chunk += para + "\n\n"
+    
+    if current_chunk:
+        chunks.append(current_chunk)
+    
+    return chunks
+
+def generate_summary(transcript):
+    chunks = split_text(transcript)
+    summaries = []
+    
+    for chunk in chunks:
+        response = openai.ChatCompletion.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": f"Meeting transcript:\n{chunk}"}
+            ],
+            temperature=TEMPERATURE,
+            max_tokens=MAX_TOKENS
+        )
+        summaries.append(response.choices[0].message.content)
+    
+    return "\n\n".join(summaries)
+
+def main():
+    parser = argparse.ArgumentParser(description='Generate meeting summary from transcript')
+    parser.add_argument('--input', type=str, required=True, help='Input transcript file')
+    parser.add_argument('--output', type=str, help='Output file (Markdown format)')
+    args = parser.parse_args()
+
+    with open(args.input, 'r') as f:
+        transcript = f.read()
+
+    print("Generating summary...")
+    summary = generate_summary(transcript)
+    
+    if args.output:
+        with open(args.output, 'w') as f:
+            f.write(summary)
+        print(f"Summary saved to {args.output}")
+    else:
+        print("\n" + "="*50 + "\n")
+        print(summary)
+
+if __name__ == "__main__":
+    main()
