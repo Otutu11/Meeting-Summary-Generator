@@ -66,3 +66,10 @@ echo "OPENAI_API_KEY='your_openai_api_key'" > .env
 **Technical Updates**
 - API performance improved by 40%
 - Discussed database scaling options
+
+
+Author Name: Anslem Otutu
+Github: https://github.com/Otutu11
+LinkedIn: https://www.linkedin.com/in/otutu-anslem-53a687359/
+
+
